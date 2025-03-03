@@ -1,32 +1,26 @@
-name: Docker Build, Push, and Deploy to DigitalOcean
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
-      - master # Change this to your default branch name if needed
+      - master
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      
-      - name: Build Docker image
-        run: |
-          docker build -t cyberbullying-detection .
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Tag Docker image
-        run: |
-          docker tag cyberbullying-detection jaysongor/cyberbullying
-
-      - name: Push Docker image
-        run: |
-          docker push jaysongor/cyberbullying
-
-
-      
-            echo "Deployment completed successfully! 🚀"
- 
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: jaysongor/cyberbullying-detection:latest
